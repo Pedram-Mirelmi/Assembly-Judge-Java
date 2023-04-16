@@ -99,14 +99,13 @@ public class SubmitHandler implements Handler {
 
             // Wait for the process to complete
             boolean exitCode = process.waitFor(1, TimeUnit.SECONDS);
-//            if(exitCode) {
-//                if(Files.mismatch(
-//                        Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1)),
-//                        Paths.get(String.format("%s/output.txt", runPath))
-//                    ) == -1) {
-//                    correctAnswers++;
-//                }
-//            }
+            if(exitCode) {
+                String expected = new String(Files.readAllBytes(Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1))));
+                String actual = new String(Files.readAllBytes(Paths.get(String.format("%s/output.txt", runPath))));
+                if(expected.equals(actual)) {
+                    correctAnswers++;
+                }
+            }
         }
         return new Pair<>(correctAnswers, inputFileNames.length);
     }
