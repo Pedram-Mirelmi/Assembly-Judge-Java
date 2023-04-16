@@ -9,7 +9,6 @@ import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import org.jsoup.Jsoup;
-import org.w3c.dom.html.HTMLScriptElement;
 
 import javax.swing.text.html.HTML;
 import java.io.File;
@@ -100,14 +99,14 @@ public class SubmitHandler implements Handler {
 
             // Wait for the process to complete
             boolean exitCode = process.waitFor(1, TimeUnit.SECONDS);
-            if(exitCode) {
-                if(Files.mismatch(
-                        Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1)),
-                        Paths.get(String.format("%s/output.txt", runPath))
-                    ) == -1) {
-                    correctAnswers++;
-                }
-            }
+//            if(exitCode) {
+//                if(Files.mismatch(
+//                        Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1)),
+//                        Paths.get(String.format("%s/output.txt", runPath))
+//                    ) == -1) {
+//                    correctAnswers++;
+//                }
+//            }
         }
         return new Pair<>(correctAnswers, inputFileNames.length);
     }

@@ -1,4 +1,4 @@
-package ir.ac.ut.cs.assembly.judge;
+
 import io.javalin.Javalin;
 import ir.ac.ut.cs.assembly.judge.HTMLs;
 import ir.ac.ut.cs.assembly.judge.Repository;
