@@ -108,7 +108,6 @@ public class SubmitHandler implements Handler {
                     correctAnswers++;
                 }
             }
-            System.out.println("Process exited with code " + exitCode);
         }
         return new Pair<>(correctAnswers, inputFileNames.length);
     }
