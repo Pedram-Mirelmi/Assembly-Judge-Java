@@ -10,6 +10,9 @@ import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        ProcessBuilder builder = new ProcessBuilder();
+
+
         Repository repository = new Repository();
         HashMap<String, String> students = new HashMap<>();
         HTMLs.init();

@@ -5,12 +5,10 @@ import io.javalin.http.Handler;
 import io.javalin.http.HandlerType;
 import ir.ac.ut.cs.assembly.judge.HTMLs;
 import ir.ac.ut.cs.assembly.judge.IRepository;
-import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import org.jsoup.Jsoup;
 
-import javax.swing.text.html.HTML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,7 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -38,18 +37,27 @@ public class SubmitHandler implements Handler {
             String problemName = context.formParam("problemName");
             String code = context.formParam("code");
             if(!repository.authStudent(studentId, password)) {
-                context.html(HTMLs.getAuthFailedPage());
+                context.html(HTMLs.getErrorPage());
                 return;
             }
             try {
-                var pair = testCode(studentId, password, code, problemName);
+                List<String> results = testCode(studentId, password, code, problemName);
                 var page = Jsoup.parse(HTMLs.getResultPage());
-                page.getElementById("passCount").text(pair.getFirst().toString());
-                page.getElementById("total").text(pair.getSecond().toString());
+                var resultList = page.getElementById("resultList");
+                var listItem = resultList.child(0);
+                for(int i = 0; i < results.size(); i++) {
+                    var newItem = listItem.clone();
+                    newItem.text(String.format("#%s: %s", i+1, results.get(i)));
+                    resultList.appendChild(newItem);
+                }
+                listItem.remove();
+//                page.getElementById("passCount").text(pair.getFirst().toString());
+//                page.getElementById("total").text(pair.getSecond().toString());
                 context.html(page.html());
             }
             catch (IllegalArgumentException e) {
-                context.html(HTMLs.getAuthFailedPage());
+                var page = Jsoup.parse(HTMLs.getErrorPage());
+                page.getElementById("message").text(e.getMessage());
             }
         }
         else {
@@ -58,7 +66,7 @@ public class SubmitHandler implements Handler {
     }
 
 
-    private Pair<Integer, Integer> testCode(String studentId, String password, String code, String problemName) throws IOException, InterruptedException {
+    private List<String> testCode(String studentId, String password, String code, String problemName) throws IOException, InterruptedException {
         if(!repository.isValidProblem(problemName)) {
             throw new IllegalArgumentException("Invalid student id");
         }
@@ -79,16 +87,24 @@ public class SubmitHandler implements Handler {
             new File(runPath).mkdir();
         }
 
-        Runtime.getRuntime().exec(String.format("nasm -f elf64 %s -o %s/code.o", archiveFilePath, runPath)).waitFor();
-        Runtime.getRuntime().exec(String.format("ld %s/code.o -e _start -o %s/a.out", runPath, runPath)).waitFor();
+        if((Runtime.getRuntime().exec(String.format("nasm -f elf64 %s -o %s/code.o", archiveFilePath, runPath)).waitFor()) != 0){
+            throw new IllegalArgumentException("Comile error! Check for any include!");
+        }
+
+        if((Runtime.getRuntime().exec(String.format("ld %s/code.o -e _start -o %s/a.out", runPath, runPath)).waitFor()) != 0) {
+            throw new IllegalArgumentException("Link Error!");
+        }
 
         String testCasesPath = String.format("./data/testCases/%s", problemName);
 
         var inputFileNames = new File(String.format("%s/in", testCasesPath)).list();
 
         int correctAnswers = 0;
+        List<String> results = new LinkedList<String>();
 
         for (int i = 0; i < Objects.requireNonNull(inputFileNames).length; i++) {
+//            String command = String.format("%s/a.out < %s/in/input%s.txt", runPath, testCasesPath, i+1);
+
             ProcessBuilder builder = new ProcessBuilder(String.format("%s/a.out", runPath));
             // Redirect input and output streams
             builder.redirectInput(new File(String.format("%s/in/input%s.txt", testCasesPath, i+1)));
@@ -98,15 +114,20 @@ public class SubmitHandler implements Handler {
             // Start the process
 
             // Wait for the process to complete
-            boolean exitCode = process.waitFor(1, TimeUnit.SECONDS);
+            boolean exitCode = process.waitFor(repository.getProblemTimeLimit(problemName), TimeUnit.MILLISECONDS);
             if(exitCode) {
                 String expected = new String(Files.readAllBytes(Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1))));
                 String actual = new String(Files.readAllBytes(Paths.get(String.format("%s/output.txt", runPath))));
                 if(expected.equals(actual)) {
                     correctAnswers++;
+                    results.add("Correct");
+                }
+                else {
+                    results.add("Wrong");
                 }
             }
+
         }
-        return new Pair<>(correctAnswers, inputFileNames.length);
+        return results;
     }
 }

@@ -3,6 +3,7 @@ import io.javalin.Javalin;
 import ir.ac.ut.cs.assembly.judge.HTMLs;
 import ir.ac.ut.cs.assembly.judge.Repository;
 import ir.ac.ut.cs.assembly.judge.handlers.SubmitHandler;
+import ir.ac.ut.cs.assembly.judge.handlers.SubmitPageHandler;
 
 import java.io.*;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class Main {
 
         var app = Javalin.create(/*config*/)
                 .get("/", ctx -> ctx.html(HTMLs.getHomePage()))
-                .get("/submitPage", ctx -> ctx.html(HTMLs.getSubmitPage()))
+                .get("/submitPage", new SubmitPageHandler(repository))
                 .post("/submit", new SubmitHandler(repository))
                 .start(10000);
     }
