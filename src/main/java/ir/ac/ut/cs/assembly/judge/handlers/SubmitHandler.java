@@ -123,6 +123,9 @@ public class SubmitHandler implements Handler {
                     results.add("Correct");
                 }
                 else {
+                    System.out.println("=============================================");
+                    System.out.println(String.format("%s: `%s`, `%s`", i+1, actual, expected));
+                    System.out.println("=============================================");
                     results.add("Wrong");
                 }
             }

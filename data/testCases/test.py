@@ -3,8 +3,8 @@ for dir in os.walk("."):
     cwd = dir[0]
     print(cwd)
     for inputFilename in dir[-1]:
-        if(not inputFilename.startswith("input")):
-            break
+        # if(not inputFilename.startswith("input")):
+        #     break
         print(inputFilename)
         with open(cwd+'/'+inputFilename) as f:
             inputStr = f.read()
