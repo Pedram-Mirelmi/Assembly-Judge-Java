@@ -8,5 +8,6 @@
   "LFC": 1000,
   "prime": 1000,
   "palindrom": 1000,
-  "listMul": 2000
+  "listMul": 2000,
+  "BinarySearch": 1000
 }

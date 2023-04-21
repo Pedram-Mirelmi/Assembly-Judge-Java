@@ -99,7 +99,7 @@ public class SubmitHandler implements Handler {
 
         var inputFileNames = new File(String.format("%s/in", testCasesPath)).list();
 
-        int correctAnswers = 0;
+//        int correctAnswers = 0;
         List<String> results = new LinkedList<String>();
 
         for (int i = 0; i < Objects.requireNonNull(inputFileNames).length; i++) {
@@ -119,7 +119,7 @@ public class SubmitHandler implements Handler {
                 String expected = new String(Files.readAllBytes(Paths.get(String.format("%s/out/output%s.txt", testCasesPath, i+1))));
                 String actual = new String(Files.readAllBytes(Paths.get(String.format("%s/output.txt", runPath))));
                 if(expected.equals(actual)) {
-                    correctAnswers++;
+//                    correctAnswers++;
                     results.add("Correct");
                 }
                 else {
@@ -128,6 +128,9 @@ public class SubmitHandler implements Handler {
                     System.out.println("=============================================");
                     results.add("Wrong");
                 }
+            }
+            else {
+                results.add("Run time error or time limit");
             }
 
         }
