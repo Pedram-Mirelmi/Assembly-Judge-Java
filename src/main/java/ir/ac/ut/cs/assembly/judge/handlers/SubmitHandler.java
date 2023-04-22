@@ -58,6 +58,7 @@ public class SubmitHandler implements Handler {
             catch (IllegalArgumentException e) {
                 var page = Jsoup.parse(HTMLs.getErrorPage());
                 page.getElementById("message").text(e.getMessage());
+                context.html(page.html());
             }
         }
         else {

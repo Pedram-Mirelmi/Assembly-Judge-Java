@@ -1,6 +1,3 @@
-%ifndef NOWZARI_IN_OUT
-%define NOWZARI_IN_OUT
-
 %ifndef SYS_EQUAL
 %define SYS_EQUAL
 
@@ -57,6 +54,9 @@
     Space         equ   0x20
 
 %endif
+
+%ifndef NOWZARI_IN_OUT
+%define NOWZARI_IN_OUT
 
 ;----------------------------------------------------
 newLine:
@@ -235,65 +235,69 @@ GetStrlen:
 
 %endif
 
-
-
 section .data
-  zero dw 0
-  msg1 db "NO", 0
-  msg2 db "YES", 0
+   palindrome dq 'YES'
+   not_palindrome dq 'NO'
 section .bss
-  string resb 10000
+   strin resb 100
 section .text
-	global _start
+    global _start
 
 _start:
-  
-  mov rbx, string 
-stringread:    
-  call getc
-  cmp rax, NL
-  je programstart
-  mov [rbx], rax
-  add rbx, 1
-  jmp stringread
-programstart: 
-  mov r8, string 
-  sub rbx, 1
-  mov r9, rbx
-  
-point1:
-  cmp r8, r9
-  jge accept
-  mov bl, [r9]
-  cmp byte [r8], bl
-  jne decline
-  add r8, 2 
-  sub r9, 2 
-  jmp point1
-  
+   xor rcx,rcx
+   mov rsi,strin
 
+input:
+   xor ax,ax
+   call getc
+   cmp al,0xa
+   jz endstr
+   cmp al,0x20
+   jz next
+   ; cmp al,96
+   ; jg small
+   ; xor al,0x20
+small:
+   mov [rsi+rcx],al
+   inc rcx
+next:
+   jmp input
 
-accept:
-  mov rsi, msg2
-  call printString
-  jmp Exit
-decline:
-  mov rsi, msg1
-  call printString
-  
+endstr:
+   xor al,al
+   mov [rsi+rcx],al
+
+   ; mov rdi,rsi+rcx-1
+   mov rdi,rsi
+   add rdi,rcx
+   sub rdi,1
+
+   xor rdx,rdx
+   xor rax,rax
+   xor rbx,rbx
+similarity_loop:
+   mov al,[rdi]
+   mov bl,[rsi]
+   cmp al,bl
+   jnz notpal
+   inc rsi
+   dec rdi
+   cmp rsi,rdi
+   jge pal
+   jmp similarity_loop
+
+pal:
+   mov rsi,palindrome
+   call printString
+   call newLine
+   jmp Exit
+
+notpal:
+   mov rsi,not_palindrome
+   call printString
+   call newLine
+   
 Exit:
-  mov rax, sys_exit
-  xor rdi, rdi
-  syscall
-  
-  
-  
-  
-  
-
-
-
-
-
-
-
+	mov     rax,  sys_exit
+	mov     rdi,rdi
+	syscall

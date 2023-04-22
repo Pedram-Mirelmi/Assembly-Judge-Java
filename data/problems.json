@@ -1,13 +1,13 @@
 {
   "helloWorld": 1000,
-  "BCD3": 500,
-  "complete": 1000,
-  "DigitAdd": 1000,
-  "DigitAddEo": 1000,
-  "GCC": 1000,
-  "LFC": 1000,
-  "prime": 1000,
-  "palindrom": 1000,
-  "listMul": 2000,
-  "BinarySearch": 1000
+  "BCD3": 200,
+  "complete": 300,
+  "DigitAdd": 400,
+  "DigitAddEo": 500,
+  "GCC": 400,
+  "LFC": 400,
+  "prime": 200,
+  "palindrome": 1,
+  "listMul": 1000,
+  "BinarySearch": 1300
 }
