@@ -36,11 +36,10 @@ public class SubmitHandler implements Handler {
             String password = context.formParam("password");
             String problemName = context.formParam("problemName");
             String code = context.formParam("code");
-            if(!repository.authStudent(studentId, password)) {
-                context.html(HTMLs.getErrorPage());
-                return;
-            }
             try {
+                if(!repository.authStudent(studentId, password)) {
+                    throw new IllegalArgumentException("Invalid Student Id or password");
+                }
                 List<String> results = testCode(studentId, password, code, problemName);
                 var page = Jsoup.parse(HTMLs.getResultPage());
                 var resultList = page.getElementById("resultList");
@@ -57,6 +56,7 @@ public class SubmitHandler implements Handler {
             }
             catch (IllegalArgumentException e) {
                 var page = Jsoup.parse(HTMLs.getErrorPage());
+                System.out.println(e.getMessage());
                 page.getElementById("message").text(e.getMessage());
                 context.html(page.html());
             }
@@ -69,7 +69,7 @@ public class SubmitHandler implements Handler {
 
     private List<String> testCode(String studentId, String password, String code, String problemName) throws IOException, InterruptedException {
         if(!repository.isValidProblem(problemName)) {
-            throw new IllegalArgumentException("Invalid student id");
+            throw new IllegalArgumentException("Problem name");
         }
         String timeNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
 
@@ -124,9 +124,9 @@ public class SubmitHandler implements Handler {
                     results.add("Correct");
                 }
                 else {
-                    System.out.println("=============================================");
-                    System.out.println(String.format("%s: `%s`, `%s`", i+1, actual, expected));
-                    System.out.println("=============================================");
+//                    System.out.println("=============================================");
+//                    System.out.println(String.format("%s: `%s`, `%s`", i+1, actual, expected));
+//                    System.out.println("=============================================");
                     results.add("Wrong");
                 }
             }
