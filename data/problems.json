@@ -9,5 +9,7 @@
   "prime": 200,
   "palindrome": 1,
   "listMul": 1000,
-  "BinarySearch": 1300
+  "BinarySearch": 1300,
+  "ramzgozari": 1000,
+  "anagram": 1000
 }
